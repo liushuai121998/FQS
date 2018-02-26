@@ -1,0 +1,117 @@
+.ant-table-thead tr:first-child th:last-child{
+	text-align: left;
+	font-size: 20px;
+}
+.ant-table-body tr.difference_flight {
+	background: #bfa;
+}
+.ant-table-body tr.update_flight td{
+	background: indianred;
+}
+.ant-table-body tr.difference_td {
+	/*background: #fff;*/
+}
+
+.ant-table-body tr td {
+	display: inline-block;
+}
+
+.index {
+	width: 60px;
+}
+.operationDate {
+	width: 80px;
+}
+.flightNo_A {
+	width: 80px;
+}
+.flightNo_D {
+	width: 80px;
+}
+.repeatCount {
+	width: 80px;
+}
+.acRegNo {
+	width: 80px;
+}
+.dori {
+	width: 80px;
+}
+.aircraftType {
+	width: 80px;
+}
+.flgVip {
+	width: 80px;
+}
+.codeShare {
+	width: 120px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.taskCode {
+	width: 80px;
+}
+.operationalStatus {
+	width: 100px;
+}
+.processStatus {
+	width: 100px;
+}
+.checkinRange {
+	width: 100px;
+}
+.carousel {
+	width: 100px;
+}
+.flightCourse {
+	width: 100px;
+}
+.originalAirport {
+	width: 120px;
+}
+.destAirport {
+	width: 120px;
+}
+.transit {
+	width: 120px;
+}
+.finalParkingbayId {
+	width: 80px;
+}
+.gate {
+	width: 80px;
+}
+.sta {
+	width: 80px;
+}
+.eta {
+	width: 80px;
+}
+.ata {
+	width: 80px;
+}
+.std {
+	width: 80px;
+}
+.etd {
+	width: 80px;
+}
+.atd {
+	width: 80px;
+}
+.estimatedInBlockTime {
+	width: 80px;
+}
+.abnormalCauseCn {
+	width: 120px;
+}
+
+
+.compare_result {
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	height: 24px;
+}

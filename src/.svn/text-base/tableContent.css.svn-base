@@ -1,0 +1,488 @@
+.table_wrap {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: #fff;
+	padding: 15px;
+	position: relative;
+}
+.search_header {
+	margin-bottom: 15px;
+}
+.search_footer {
+	position: absolute;
+	left: 15px;
+	bottom: 6px;
+	width: calc(100% - 30px);
+	height: 30px;
+	line-height: 30px;
+}
+.content_wrap {
+	position: relative;
+}
+.scroll_y {
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 11;
+	width: 14px;
+	height: 100%;
+	background: #e2e2e2;
+	display: none;
+}
+.scroll_y_bar {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: calc(100% - 4px);
+	min-height: 30px;
+	background: #757070;
+	transform: translateX(2px);
+}
+.scroll_x {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 14px;
+	width: calc(100% - 14px);
+	background: #e2e2e2;
+	display: none;
+}
+.scroll_x_bar {
+	position: absolute;
+	left: 0;
+	top: 0;
+	min-width: 50px;
+	height: calc(100% - 4px);
+	background: #757070;
+	transform: translateY(2px);
+}
+
+.ant-table-header table, .ant-table-body table {
+	position: relative;
+	-webkit-touch-callout: none;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+/*颜色示例*/
+
+.color_modal .ant-modal-body {
+	padding: 4px;
+}
+.color_modal .ant-modal-close {
+	height: 38px;
+	line-height: 38px;
+}
+.color_modal .ant-modal-close .ant-modal-close-x {
+	height: 38px;
+	line-height: 38px;
+}
+.color_wrap li {
+	padding: 8px;
+}
+
+/*单行高亮*/
+.ant-table-body table tr.line_hight {
+	background: #FFFF01 !important;
+}
+/*到港颜色*/
+.ant-table-body table tr.come_flight {
+	background: #FFEAB8;
+}
+.ant-table-body table tr.come_flight_high {
+	background: #FFEAB8;
+}
+/*离港颜色*/
+.ant-table-body table tr.leave_flight {
+	background: #9FA09F;
+}
+.ant-table-body table tr.leave_flight_high {
+	background: #9FA09F;
+}
+/*登机结束*/
+.ant-table-body table tr.end_boarding {
+	background: #E2EEB6;
+}
+.ant-table-body table tr.end_boarding_high {
+	background: #E2EEB6;
+}
+/*过站登机*/
+.ant-table-body table tr.boarding {
+	background: #D6E2FA;
+}
+.ant-table-body table tr.boarding_high {
+	background: #D6E2FA;
+}
+/*前场起飞*/
+.ant-table-body table tr.first_flight {
+	background: #CFF2E7;
+}
+.ant-table-body table tr.first_flight_high {
+	background: #CFF2E7;
+}
+/*取消*/
+.ant-table-body table tr.cancel_flight {
+	background: #C8C8C8;
+}
+/**层级较高取消*/
+.content_wrap .ant-table-body table tr.cancel_flight_high {
+	background: #C8C8C8;
+}
+
+.ant-table-body table tr.normal_flight_high {
+	background: #fff;
+}
+
+/**
+ * 延误备降
+ */
+.ant-table-body table tr.delay_flight {
+	background: #FAD9EA;
+}
+.content_wrap .ant-table-body table tr.delay_flight_high {
+	background: #FAD9EA;
+}
+/**
+ * 选中
+ */
+.table-content .ant-table-body table tr.active {
+	background: #B8CF01;
+}
+
+.ant-table-placeholder {
+	/*width: calc(100% - 14px)*/
+	/*width: 200px;*/
+}
+.ant-checkbox-group {
+	margin-top: 20px;
+}
+.ant-checkbox-group .ant-checkbox-group-item {
+	display: block;
+}
+.table_wrap .ant-table-thead {
+	white-space: nowrap;
+}
+.table_wrap colgroup {
+	display: none;
+}
+.table-header {
+	position: relative;
+	left: 0;
+	top: 0;
+	z-index: 10;
+}
+.table-header tr th {
+	position: relative;
+	min-width: 33px;/*最小宽度*/
+}
+
+/*列头拖拽的class*/
+.table-header tr th .drag_flag {
+	position: absolute;
+	right: 0px;		/*设置right会影响ellipsis的计算*/
+	top: 0;
+	background: #f7f7f7;
+	width: 5px;
+	height: 100%; 
+	z-index: 100;
+	cursor: ew-resize;
+}
+
+.table-header .ant-table-placeholder{
+	display:none;
+}
+.table-content{
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.table-content .ant-table-thead {
+	visibility: hidden;
+	/*display: none;*/
+}
+.table-content .ant-table-thead tr th {
+	height: 41px;
+}
+.table-content .ant-table-tbody tr {
+	white-space: nowrap;
+}
+.table-content tr td {
+	white-space: nowrap;
+	/*overflow: hidden;
+	text-overflow: ellipsis;*/
+	/*min-width: 49px;	/*最小宽度*/
+	min-width: 33px;
+	box-sizing: border-box;
+}
+.table-header tr th {
+	display: inline-block;
+	white-space: nowrap;
+	/*overflow: hidden;
+	text-overflow: ellipsis;*/
+	/*min-width: 49px;*/
+	min-width: 33px;
+	height: 41px;
+	box-sizing: border-box;
+}
+.table-header tr th>span, .table-header tr th>span>div:first-child, .table-content tr td>span {
+	display: block;
+	width: 100%;
+}
+.column_title {
+	display: block;
+	/*width: 100%;*/
+	overflow: hidden;
+	text-overflow: ellipsis;
+	box-sizing: border-box;
+	/*min-width: 33px;*/
+}
+.table-header .ant-table-column-sorter {
+	position: absolute;
+	right: 4px;
+	top: 58%;
+	transform: translateY(-50%);
+}
+/*箭头大小*/
+.table-header .ant-table-column-sorter .anticon {
+	font-size: 15px;
+}
+.table-content tr td, .table-content thead tr th {
+	display: inline-block;
+}
+
+.table-header .ant-table-thead > tr > th, .table-content .ant-table-tbody > tr > td {
+	transition: none;		/*取消过渡的效果*/
+}
+.index {
+	width: 60px;
+}
+.operationDate {
+	width: 80px;
+}
+.flightNo_A {
+	width: 85px;
+}
+.flightNo_D {
+	width: 85px;
+}
+.repeatCount {
+	width: 85px;
+}
+.acRegNo {
+	width: 80px;
+}
+.dori {
+	width: 80px;
+}
+.aircraftType {
+	width: 80px;
+}
+.flgVip {
+	width: 80px;
+}
+.codeShare {
+	width: 120px;
+}
+.taskCode {
+	width: 82px;
+}
+/*.operationalStatus {
+	width: 120px;
+}*/
+.newStatus {
+	width: 120px;
+}
+.checkinRange {
+	width: 100px;
+}
+.carousel {
+	width: 100px;
+}
+.flightCourse {
+	width: 100px;
+}
+.originalAirport {
+	width: 100px;
+}
+.destAirport {
+	width: 100px;
+}
+.transit {
+	width: 100px;
+}
+.finalParkingbayId {
+	width: 80px;
+}
+.gate {
+	width: 85px;
+}
+.sta {
+	width: 70px;
+}
+.eta {
+	width: 70px;
+}
+.ata {
+	width: 70px;
+}
+.std {
+	width: 70px;
+}
+.etd {
+	width: 70px;
+}
+.atd {
+	width: 70px;
+}
+.estimatedInBlockTime {
+	width: 70px;
+}
+.abnormalCauseCn {
+	width: 120px;
+}
+.startSer {
+	width: 105px;
+}
+.endSer {
+	width: 105px;
+}
+/**
+ * 界面配置的样式
+ */
+.config_modal {
+	/*height: 100%;
+	top: 0;*/
+	position:absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	height: 520px;
+	margin: auto;
+}
+.config_modal .ant-modal-content {
+	width: 100%;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.config_modal .ant-modal-body {
+	background: #F9F9F9;
+	padding-bottom: 0;
+}
+.config_modal .ant-modal-footer {
+	background: #F9F9F9;
+	border-top: none;
+	text-align: center;
+}
+.ant-confirm-btns .atn-btn-lg:first-child{
+	background: #FE664D !important;
+	border-color: #FE664D !important;
+	padding-left: 20px;
+	padding-right: 20px;
+	color: #fff !important;
+}
+
+.config_modal .ant-transfer-operation .ant-btn span, .config_modal .up_down_move .ant-btn span{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+/**
+ * 确认
+ */
+
+
+
+.config_modal .ant-modal-title {
+	margin-left: 12px;
+}
+
+.config_tabs .ant-tabs-content {
+	background: #fff;
+}
+.config_tabs .ant-tabs-bar {
+	margin-bottom: 0;
+	border-bottom: none;
+}
+
+.ant-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab {
+	margin-right: 2px;
+	border: none;
+	background: #D1D1D1;
+}
+.ant-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab.ant-tabs-tab-active {
+	background: #fff;
+}
+
+.config_tabs .ant-tabs-tabpane {
+	padding: 15px 0;
+}
+
+.up_down_move {
+	position: absolute;
+	left: 50%;
+	top: 60%;
+	transform: translateX(-50%);
+}
+
+.flight_transfer .ant-transfer-list:first-child,  .service_transfer .ant-transfer-list:first-child{
+	margin-right: 60px;
+}
+.flight_transfer .ant-transfer-list:last-child, .service_transfer .ant-transfer-list:last-child {
+	margin-left: 60px;
+} 
+.flight_transfer .ant-btn, .up_down_move .ant-btn, .service_transfer .ant-btn{
+	width: 60px;
+	height: 28px;
+	text-align: center;
+	margin-bottom: 5px;
+}
+.flight_transfer .ant-transfer-operation .ant-btn:first-child, .service_transfer .ant-transfer-operation .ant-btn:first-child {
+	margin-bottom: 5px;
+}
+
+.flight_type_config {
+	height: 400px;	
+}
+.come_leave_config .ant-checkbox-group, .type_config .ant-checkbox-group{
+	margin-top: 0;
+	float: right;
+}
+.ant-checkbox-group .ant-checkbox-group-item {
+	display: inline-block;
+}
+.come_leave_config .ant-checkbox-wrapper, .type_config .ant-checkbox-wrapper {
+	margin-right: 30px;
+}
+.come_leave_config .ant-checkbox-wrapper .ant-checkbox, .type_config .ant-checkbox-wrapper .ant-checkbox{
+	margin-right: 15px;
+}
+.table-content .ant-table-tbody tr td {
+	border-bottom-width: 1px !important;
+	border-bottom-color: rgba(200, 200, 200, .7);
+}
+
+/*tooltip*/
+.over_tooltip {
+	white-space: normal;
+}
+
+.search_footer {
+	font-size: 14px;
+	color: #000;
+}
+
+
+.info_wrap {
+	padding: 0;
+}
+
+
+.ant-table-thead > tr > th.ant-table-column-sort .drag_flag {
+	background: #eee;
+}

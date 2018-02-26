@@ -1,0 +1,579 @@
+/**
+ * 
+ * @param {Object} newItem
+ */
+Array.prototype.newPush = function (newItem){
+			let flag = false
+			this.forEach(item => {
+				if(item.id === newItem.id) {
+					flag = true
+					return
+				}
+			})
+			!flag && this.push(newItem)
+			return this
+}
+/**
+ * IA排序
+ * @param {Object} msg
+ * @param {Object} str
+ * @param {Object} previous
+ */
+function msgSortStr (msg, str, previous) {
+		
+		switch(str){
+			case 'A':
+			if(msg.operationalStatus != null && (msg.operationalStatus.indexOf('取消') >= 0 || msg.operationalStatus.indexOf('备降') >= 0)) {
+						msg.num = `A, ${msg.operationDate}, ${msg.repeatCount}, ${msg.flightNo}`
+					} else if(msg.ata != null ) { // 实际到港时间ata
+						msg.num = `3, ${msg.operationDate}, ${msg.ata}, ${msg.repeatCount}, ${msg.flightNo}`
+					} else if(msg.eta != null) {
+						msg.num = `7, ${msg.operationDate}, ${msg.eta}, ${msg.repeatCount}, ${msg.flightNo}`
+					} else {
+						msg.num = `9, ${msg.operationDate}, ${msg.sta}, ${msg.repeatCount}, ${msg.flightNo}`
+					}
+			break;
+			case 'D':
+				if(msg.operationalStatus != null && (msg.operationalStatus.indexOf('取消') >= 0 || msg.operationalStatus.indexOf('备降') >= 0)) {
+					msg.num = `A, ${msg.operationDate}, ${msg.repeatCount}, ${msg.flightNo}`
+				} else if(msg.atd != null) {	// 实际起飞时间atd
+												
+					msg.num = `1, ${msg.operationDate}, ${msg.atd}, ${msg.repeatCount}, ${msg.flightNo}`
+												
+				} else {
+					let str = msg.etd == null ? msg.std : msg.etd
+					msg.num = `4, ${msg.operationDate}, ${str}, ${msg.repeatCount}, ${msg.flightNo}`
+				}
+			break;
+			case 'all':
+				if(msg.operationalStatus != null && (msg.operationalStatus.indexOf('取消') >= 0 || msg.operationalStatus.indexOf('备降') >= 0)) {
+					msg.num = `A, ${msg.operationDate}, ${msg.repeatCount}, ${msg.flightNo}`
+								
+							} else if(previous && previous.atd != null) {
+
+								msg.num = `2, ${msg.operationDate}, ${msg.atd}, ${msg.repeatCount}, ${msg.flightNo}`
+								
+							} else if(msg.ata != null) {
+								
+								msg.num = `5, ${msg.operationDate}, ${msg.ata}, ${msg.repeatCount}, ${msg.flightNo}`
+
+							} else if(msg.eta != null) {
+								
+								msg.num = `6, ${msg.operationDate}, ${msg.eta}, ${msg.repeatCount}, ${msg.flightNo}`
+
+							} else {
+
+								msg.num = `8, ${msg.operationDate}, ${msg.sta}, ${msg.repeatCount}, ${msg.flightNo}`
+								
+							}
+			break;
+		}
+		return msg
+}
+/**
+ * 默认IA排序
+ * @param {Object} data
+ */
+function flightConSort (data, comeLeaveStr) {		// 初始化的数据data
+		let comeLeave = {
+			A: (data) => {
+				data = data.filter(item => item.aord === 'A')
+				data.forEach((item) => {
+//					if(item.id === this.activeId) {
+//						item.active = true
+//					} else {
+//						item.active = false
+//					}
+					item = msgSortStr(item, "A")
+					
+				})
+
+				return data
+			},
+			D: (data) => {
+				data = data.filter(item => item.aord === 'D')
+				
+				data.forEach((item) => {
+					if(item.id === this.activeId) {
+						item.active = true
+					} else {
+						item.active = false
+					}
+					
+					item = msgSortStr(item, "D")
+					
+				})
+
+				return data
+			},
+			all: (data) => {
+				data = mergeFlight(data)
+				return data
+			}
+		}
+		
+		data = comeLeave[comeLeaveStr](data)
+		// 执行了两遍
+		// 排序
+		data.sort((a, b) => {
+			return a['num'].localeCompare(b['num'])
+		})
+		
+		return data
+}
+/**
+ * 合并后的数据
+ * @param {Object} data
+ */
+function mergeFlight (data) {
+				let initData = data
+				let filterData = []
+				let filterData2 = []
+				let filterData3 = []
+				
+				let previousFlightNoArr = []
+				for(let i=0, len=initData.length; i<len; i++) {
+					if(initData[i].nextFlight && initData[i].aord === 'A') {
+						filterData.push(initData[i])
+					} else if(initData[i].previousFlight && initData[i].aord === 'D') {
+						filterData2.push(initData[i])
+						previousFlightNoArr.push(initData[i].previousFlight)
+					} else {
+						filterData3.push(initData[i])
+					}
+				}
+
+				
+				let mergeNextIndex = []
+				
+				// 到
+				filterData.forEach(item => {
+					
+					let previousFlightIndex = previousFlightNoArr.indexOf(item.flightNo)
+					
+					if( previousFlightIndex >= 0) {
+
+						if(filterData2[previousFlightIndex].previousFlightOperationDate === item.operationDate && (!filterData2[previousFlightIndex].preRepeatCount ? "0" : filterData2[previousFlightIndex].preRepeatCount) === item.repeatCount && filterData2[previousFlightIndex].flightNo === item.nextFlight) {
+
+							mergeNextIndex.push(previousFlightIndex)
+							item = manageItem(item, filterData2[previousFlightIndex])
+							item = msgSortStr(item, "all", filterData2[previousFlightIndex])
+						} else {
+							item.std = ''
+							item.etd = ''
+							item.atd = ''
+							item = msgSortStr(item, 'A')
+						}
+					} else {
+						item.std = ''
+						item.etd = ''
+						item.atd = ''
+						item = msgSortStr(item, 'A')
+					}
+				})
+				
+				let flag = 0
+
+				mergeNextIndex.forEach(item => {
+					filterData2.splice(item - flag, 1)
+					flag++
+				})
+				filterData2.forEach(item => {
+					item.sta = ''
+					item.ata = ''
+					item.eta = ''
+					item = msgSortStr(item, 'D')
+				})
+				
+				filterData3.forEach(item => {
+					if(item.aord === 'A') {
+						item.std = ''
+						item.etd = ''
+						item.atd = ''
+						item = msgSortStr(item, 'A')
+					} else if(item.aord === 'D') {
+						item.sta = ''
+						item.ata = ''
+						item.eta = ''
+						item = msgSortStr(item, 'D')
+					}
+				})
+				let mergeTableData = [].concat(filterData, filterData2, filterData3)
+				// 航控排序
+//				let activeId = this.activeId	// 被点击的数据
+				
+	return mergeTableData
+}
+/**
+ * 合并每一项
+ * @param {Object} item
+ * @param {Object} previousFlightIndex
+ */
+function manageItem (item, previousFlight) {
+					// 合并	
+							for(let n in item) {
+								if(n !== 'services') {
+									// 基础列		
+												if(n === 'id') {
+													item[n] = item[n] + ' / ' + previousFlight[n]
+//													if(item[n] === activeId) {
+//														item.active = true
+//													} else {
+//														item.active = false
+//													}
+												} else if(n === 'flightCourse') {
+													// 航线
+													let startArr = item[n].split('-')
+													let endArr = previousFlight[n].split('-')
+													endArr.splice(0, 1)
+													let result = startArr.concat(...endArr).join('-')
+													item[n] = result
+													
+												} else if(n === 'originalAirport') {	// originalAirport  destAirport transit
+													// 始发站
+													item[n] = item[n]
+													
+												} else if (n === 'destAirport') {
+													// 目的站
+													item[n] = previousFlight[n]
+												} else if (n === 'transit') {
+													// 经停站
+													item[n] = item[n] ? (item[n] + ' ' + previousFlight['originalAirport'] + ' ' + previousFlight[n]) : (previousFlight['originalAirport'] + ' ' + previousFlight[n])
+													
+												} else if (n === 'std' || n === 'atd' || n=== 'etd') {
+													item[n] = previousFlight[n]
+												} else if (n === 'sta' || n === 'ata' || n==='eta') {
+													item[n] = item[n]
+												} else if (n === 'newTime') {
+													if(item[n]) {
+														if(previousFlight[n]) {
+															item[n] = item[n] !== previousFlight[n] ? (item[n] + ' / ' + previousFlight[n] ) : item[n]
+														}
+													} else {
+														item[n] = previousFlight[n] ? previousFlight[n] : null
+													}
+												} else {
+													if(previousFlight[n] !== item[n]) {
+														if(previousFlight[n]) {
+															item[n] = item[n] ? (item[n] + ' / ' + previousFlight[n] ) : previousFlight[n]
+														}
+													}
+												}
+								} else {
+									// 服务列
+									item[n].forEach((subItem, index) => {
+										if(previousFlight[n][index] && previousFlight[n][index].actualStartTime) {
+											subItem.actualStartTime = subItem.actualStartTime ? subItem.actualStartTime + ' / ' + previousFlight[n][index].actualStartTime : previousFlight[n][index].actualStartTime
+										}
+										if(previousFlight[n][index] && previousFlight[n][index].actualEndTime) {
+											subItem.actualEndTime = subItem.actualEndTime ? subItem.actualEndTime + ' / ' + previousFlight[n][index].actualEndTime : previousFlight[n][index].actualEndTime
+										}
+									})
+								}
+								
+							}
+						return item
+				}
+/**
+ * 获取更新后的数据
+ * @param {Object} initData
+ */
+
+function getUpdateData (initData, comeLeaveStr) {
+	let initTableData = []
+	initTableData = flightConSort(JSON.parse(JSON.stringify(initData)), comeLeaveStr)		// IA排序
+	return initTableData
+}
+
+let commonUtil = (initData, msg, isTable) => {
+	let updateIndex = -1
+	if(isTable) {
+		
+		for(let i=0, len=initData.length; i<len; i++) {
+			if(initData[i].id.indexOf(msg.id) >= 0) {
+				updateIndex = i
+			}
+		}
+		
+	} else {
+		
+		for(let i=0, len=initData.length; i<len; i++) {
+			if(initData[i].id === msg.id) {
+				updateIndex = i
+			}
+		}
+		
+	}
+	return updateIndex
+}
+/**
+ * 处理航班连班的数组方法 	找到对应的连班航班index
+ * @param {Object} arr
+ * @param {Object} keyName
+ * @param {Object} valueName
+ */
+function arrUtil (arr, keyName, valueName) {
+		let searchIndex = -1;
+		let flag = []
+		
+		for(let i=0,len=arr.length; i<len; i++) {
+			keyName.forEach((item, index) => {
+				if(arr[i][item] && arr[i][item].indexOf(valueName[index]) >= 0) {
+					flag.push(true)
+				}
+			})
+			if(flag.length === valueName.length) {
+				searchIndex= i;
+				break;
+			}
+		}
+		
+		return searchIndex;	
+}
+					
+/**
+ * 
+ * @param {Object} e
+ */
+onmessage = function (e) {
+	let {data, state, comeLeaveStr} = e.data
+	let {initData, tableData, initTableData} = state
+		// 航班更新事件
+	let msg = data.mesg
+		let flightUpdate = {
+			FLIGHT: {
+				init: (flag, initData, msg) => {
+					/**
+					 * 获取数据需要更新或删除的index
+					*/
+					let commonUtil = (callback, isUpdate, addCallback) => {
+											let updateIndex = -1
+											if(isUpdate) {
+												for(let i=0, len=initData.length; i<len; i++) {
+														if(initData[i].id === msg.id) {
+															updateIndex = i
+														} else {
+															if(msg.operationDate === initData[i].operationDate && initData[i].repeatCount === msg.repeatCount && msg.aord === initData[i].aord && initData[i].codeShare && initData[i].codeShare.indexOf(msg.flightNo) >= 0) {
+																
+																if(initData[i].codeShare.indexOf(', ') >= 0) {
+																	let codeShare = initData[i].codeShare.split(', ')
+																	let codeIndex = codeShare.indexOf(msg.flightNo)
+																	
+																	codeShare.splice(codeIndex, 1)
+																	initData[i].codeShare = codeShare.join(', ')
+																} else {
+																	initData[i].codeShare = ''
+																}
+																addCallback && addCallback()
+															}
+														}
+												}
+											} else {
+												for(let i=0, len=initData.length; i<len; i++) {
+														if(initData[i].id === msg.id) {
+															updateIndex = i
+															break
+														}
+												}
+											}
+													
+													// 找出需要更新的数据
+											if(updateIndex >= 0) {
+												callback && callback(updateIndex)
+											}
+											
+					}
+					msg.services = []
+					
+					initData[0].services.forEach(item => {
+						let cloneObj = JSON.parse(JSON.stringify(item))
+						cloneObj.actualStartTime = null
+						cloneObj.actualEndTime = null
+						msg.services.push(cloneObj)
+					})
+					
+					
+					let codeShare = false
+					if(msg.codeShare) {
+						// 主航班和共享航班号不相同
+						// 找出对应的主航班号
+						let spliceIndex = -1
+						initData.forEach((item, index) => {
+							if(item.id === msg.id) {
+								spliceIndex = index
+							}
+							if(msg.aord === item.aord && msg.codeShare === item.flightNo && msg.repeatCount === item.repeatCount && msg.operationDate === item.operationDate) {
+								codeShare = true
+								item.codeShare = item.codeShare ? item.codeShare + ', ' + msg.flightNo : msg.flightNo
+							}
+						})
+						
+						if(spliceIndex >= 0) {
+							initData.splice(spliceIndex, 1)
+						}
+						initTableData = getUpdateData(JSON.parse(JSON.stringify(initData)), comeLeaveStr)
+					}
+					
+					if(!codeShare) {
+						// 不是共享航班
+							switch (flag) {
+								case 'I': 
+								initData.newPush(msg)
+								initTableData = getUpdateData(JSON.parse(JSON.stringify(initData)), comeLeaveStr)	
+								break;
+								case 'U':
+								commonUtil((updateIndex) => {
+									let updateServices = initData[updateIndex].services
+									initData[updateIndex] = msg
+									initData[updateIndex].services = updateServices
+
+									initTableData = getUpdateData(JSON.parse(JSON.stringify(initData)), comeLeaveStr)
+									
+								}, true, () => {
+									initData.newPush(msg)
+									initTableData = getUpdateData(JSON.parse(JSON.stringify(initData)), comeLeaveStr)
+								})
+								break;
+								case 'D':
+								
+								commonUtil((updateIndex) => {
+									initData.splice(updateIndex, 1)
+									
+									initTableData = getUpdateData(JSON.parse(JSON.stringify(initData)), comeLeaveStr)
+									
+								}, false)
+
+								break;
+						}
+					}
+					
+				},
+				// 新增航班
+				I: (initData, msg) => {
+					flightUpdate['FLIGHT'].init('I', initData, msg)
+				},
+				// 更新航班
+				U: (initData, msg) => {
+					flightUpdate['FLIGHT'].init('U', initData, msg)
+//					if(msg.aord === 'D') {
+//						let tSearchIndex = arrUtil(tableData, ['aord', 'operationDate', 'repeatCount', 'nextFlight'], ['A', msg.previousFlightOperationDate, msg.preRepeatCount, msg.flightNo])
+//						let iSearchIndex = arrUtil(initData, ['aord', 'operationDate', 'repeatCount', 'nextFlight'], ['A', msg.previousFlightOperationDate, msg.preRepeatCount, msg.flightNo])
+//						if(tSearchIndex < 0 && iSearchIndex < 0) {
+//							// 非连班
+//							let initIndex = commonUtil(initData, msg, false)
+//							let tableIndex = commonUtil(tableData, msg, true)	// 不是连班的情况
+//							
+//							postMessage({
+//								type: 'U',
+//								initIndex,
+//								tableIndex,
+//							})
+//							
+//						} else {
+//							// 存在连班的情况
+//							if(tSearchIndex >= 0) {
+//								
+//								tableData[tSearchIndex] = manageItem(tableData[tSearchIndex], msg)
+//								
+//							} else {
+//								
+//								
+//							}
+//							
+//						}
+//					}
+//
+//					let initIndex = commonUtil(initData, msg, false)
+//					let tableIndex = commonUtil(tableData, msg, true)	// 不是连班的情况
+//							
+//					postMessage({
+//						type: 'U',
+//						initIndex,
+//						tableIndex,
+//					})
+					
+				},
+				// 删除航班
+				D: (initData, msg) => {
+					
+//					let initIndex = commonUtil(initData, msg)
+//					let tableIndex = commonUtil(tableData, msg)	// 不是连班的情况
+//					
+//					postMessage({
+//						type: 'D',
+//						initIndex,
+//						tableIndex,
+//					})
+					
+					flightUpdate['FLIGHT'].init('D', initData, msg)
+					
+				}
+			},
+			SERVICE: {
+				init: (data) => {
+					let indexObj = {}
+					for(let i=0, len=data.length; i<len; i++) {
+						if(data[i].id.indexOf(msg.id) >= 0 ) {
+							indexObj.dataIndex = i
+							data[i]['services'].forEach((item, index) => {
+								
+								if(item.detailNo === msg.detailNo) {
+//									item.actualStartTime = msg.actualStartTime
+//									item.actualEndTime = msg.actualEndTime
+									indexObj.serviceIndex = index
+									return
+								}
+							})
+							break
+							
+						}
+					}
+					return indexObj
+				},
+				// 服务更新
+				U: (initData, msg) => {
+//					let initObj = flightUpdate.SERVICE.init(initData)
+//					let tableObj = flightUpdate.SERVICE.init(tableData)
+//					
+//					postMessage({
+//						type: 'SERVICE',
+//						initObj,
+//						tableObj,
+//					})
+					for(let i=0, len=initData.length; i<len; i++) {
+						if(initData[i].id.indexOf(msg.id) >= 0 ) {
+							initData[i]['services'].forEach(item => {
+								if(item.detailNo === msg.detailNo) {
+									item.actualStartTime = msg.actualStartTime
+									item.actualEndTime = msg.actualEndTime
+									return
+								}
+							})
+							break
+						}
+					}
+					for(let i=0, len=initTableData.length; i<len; i++) {
+						if(initTableData[i].id.indexOf(msg.id) >= 0 ) {
+							initTableData[i]['services'].forEach(item => {
+								if(item.detailNo === msg.detailNo) {
+									item.actualStartTime = msg.actualStartTime
+									item.actualEndTime = msg.actualEndTime
+									return
+								}
+							})
+							break
+						}
+					}
+				}
+			}
+	}
+    flightUpdate[data.type][data.flag] && flightUpdate[data.type][data.flag](initData, data.mesg)
+    
+    
+    
+    postMessage({
+    	initData,
+    	initTableData
+    })
+    
+}
